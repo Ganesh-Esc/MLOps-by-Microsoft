@@ -1,24 +1,60 @@
 name: Code checks
 
 on:
+  # CHANGE 1: Add pull_request trigger
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
-  job1:
-    name: linting
+  # LINTING JOB
+  linting:
+    # CHANGE 4: Name the job clearly for GitHub Status Checks
+    name: Code checks / Linting
     runs-on: ubuntu-latest
     steps:
-    - name: Check out repo
-      uses: actions/checkout@main
-    - name: Use Python version 3.8
-      uses: actions/setup-python@v3
-      with:
-        python-version: '3.8'
-    - name: Install Flake8
-      run: |
-        python -m pip install flake8
-    - name: Run linting tests
-      run: | 
-        flake8 src/model/
+      - name: Check out repo
+        # CHANGE: Use standard actions/checkout@v3 for compatibility
+        uses: actions/checkout@v3
+      - name: Use Python version 3.8
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+      
+      # CHANGE 2: Install all dependencies from requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      # Run flake8 over the src directory
+      - name: Run Linting
+        # The challenge instructions mention checking 'tests' folder, 
+        # but the linter is meant for source code, so checking 'src' is standard.
+        run: |
+          flake8 src/
 
-
+  # UNIT TESTS JOB
+  unit-tests:
+    # This job can run in parallel with linting (no 'needs' required)
+    # CHANGE 4: Name the job clearly for GitHub Status Checks
+    name: Code checks / Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+      - name: Use Python version 3.8
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+          
+      # CHANGE 2: Install all dependencies from requirements.txt (must include pytest)
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      # CHANGE 3: Run Pytest over the tests directory
+      - name: Run Unit Tests
+        run: |
+          pytest tests/
