@@ -1,0 +1,54 @@
+name: Challenge 5: Environment Training Jobs
+
+# Trigger on pushes to the main branch
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  # --- EXPERIMENT JOB (Development Environment) ---
+  experiment:
+    runs-on: ubuntu-latest
+    environment: development # Targets the development environment
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          # Uses the AZURE_CREDENTIALS secret from the 'development' environment
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          # UPDATED TENANT ID
+          tenant-id: 5f520565-3db9-495b-be28-c005e0523ac3 
+          
+      # Trigger job using the dev data asset
+      - name: Trigger Dev Training Job
+        # Use --stream to make the GitHub Action wait for the Azure ML job to finish
+        run: |
+          az ml job create --file azure-ml/job.yml --set inputs.training_data='azureml:diabetes-dev-folder:latest' --stream
+
+  # --- PRODUCTION JOB (Production Environment) ---
+  production:
+    # Condition: Must wait for the 'experiment' job to succeed
+    needs: experiment
+    runs-on: ubuntu-latest
+    environment: production # Targets the production environment (requires approval)
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          # Uses the AZURE_CREDENTIALS secret from the 'production' environment
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          # UPDATED TENANT ID
+          tenant-id: 5f520565-3db9-495b-be28-c005e0523ac3
+
+      # Trigger job using the prod data asset
+      - name: Trigger Prod Training Job
+        run: |
+          az ml job create --file azure-ml/job.yml --set inputs.training_data='azureml:diabetes-prod-folder:latest' --stream
