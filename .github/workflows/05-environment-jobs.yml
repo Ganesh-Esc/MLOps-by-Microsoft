@@ -1,4 +1,4 @@
-name: Challenge 5: Environment Training Jobs
+name: Challenge 5 Environment Training Jobs
 
 # Trigger on pushes to the main branch
 on:
