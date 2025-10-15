@@ -21,7 +21,7 @@ jobs:
         with:
           # Uses the AZURE_CREDENTIALS secret from the 'development' environment
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-          # UPDATED TENANT ID
+          # UPDATED TENANT ID (NO SEMICOLON HERE!)
           tenant-id: 5f520565-3db9-495b-be28-c005e0523ac3 
                  
       # Trigger job using the dev data asset
@@ -45,7 +45,7 @@ jobs:
         with:
           # Uses the AZURE_CREDENTIALS secret from the 'production' environment
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-          # UPDATED TENANT ID
+          # UPDATED TENANT ID (NO SEMICOLON HERE!)
           tenant-id: 5f520565-3db9-495b-be28-c005e0523ac3
 
       # Trigger job using the prod data asset
