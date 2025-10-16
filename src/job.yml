@@ -1,6 +1,6 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 # Path to the local folder containing your train.py script
-code: ./src  # <-- CHANGED from ./model to ./src
+code: .  # <-- CHANGED from ./model to ./src
 command: >-
   python train.py
   --training_data ${{inputs.training_data}}
