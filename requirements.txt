@@ -3,4 +3,3 @@ mlflow==2.11.3  # Upgrading to a compatible version that works with newer pip
 pandas==1.4.3
 sklearn==0.0
 scikit-learn==1.1.1
-2. Commit and Monitor
