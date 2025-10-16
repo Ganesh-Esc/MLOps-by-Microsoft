@@ -1,18 +1,20 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 # Path to the local folder containing your train.py script
-code: ./model 
+code: ./model
 command: >-
-  python train.py 
+  python train.py
   --training_data ${{inputs.training_data}}
-  --reg_rate ${{inputs.reg_rate}} # Correct parameter syntax
+  --reg_rate ${{inputs.reg_rate}}
 inputs:
   training_data:
     type: uri_folder
-    # The name of the data asset you registered in step 2
-    path: azureml:diabetes-dev-folder:1 
+    # CRITICAL FIX: Add 'mode: download' to ensure the data is downloaded to a local path
+    mode: download
+    # Using :latest is best practice in CI/CD unless you need a fixed version
+    path: azureml:diabetes-dev-folder:latest
   reg_rate: 0.01
 environment: azureml:AzureML-sklearn-0.24-ubuntu18.04-py37-cpu@latest
 # The low-cost cluster name you just created
-compute: azureml:aml-cpu 
+compute: azureml:aml-cpu
 experiment_name: diabetes-training
 description: Command job to train the diabetes model using the compliant data asset.
