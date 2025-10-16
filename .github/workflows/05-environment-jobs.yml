@@ -19,7 +19,7 @@ jobs:
           python-version: '3.9'
           
       - name: Install dependencies
-        # Crucial step: Upgrade dependency tools first and install requirements
+        # Upgrades pip and setuptools to prevent build errors and installs requirements (including updated mlflow)
         run: |
           pip install --upgrade pip setuptools
           pip install -r requirements.txt
@@ -27,14 +27,16 @@ jobs:
       - name: Azure Login
         uses: azure/login@v1
         with:
-          # Rely solely on the 'creds' secret, which contains all necessary SPN details (client-id, secret, tenant-id)
+          # Uses the full Service Principal JSON secret, resolving the login conflict
           creds: ${{ secrets.AZURE_CREDENTIALS }}
           
       - name: Trigger Dev Training Job
-        # Ensure your workspace name and resource group are correct in the below commands if they are not the defaults.
-        # This command uses the registered 'diabetes-dev-folder' data asset.
         run: |
-          az ml job create --file azure-ml/job.yml --set inputs.training_data='azureml:diabetes-dev-folder:latest' --stream
+          az ml job create --file azure-ml/job.yml \
+          --set inputs.training_data='azureml:diabetes-dev-folder:latest' \
+          --resource-group mlops-rg \
+          --workspace-name mlops-ws \
+          --stream
 
   production:
     needs: experiment
@@ -56,10 +58,12 @@ jobs:
       - name: Azure Login
         uses: azure/login@v1
         with:
-          # Rely solely on the 'creds' secret for production environment
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Trigger Prod Training Job
-        # This command uses the registered 'diabetes-prod-folder' data asset.
         run: |
-          az ml job create --file azure-ml/job.yml --set inputs.training_data='azureml:diabetes-prod-folder:latest' --stream
+          az ml job create --file azure-ml/job.yml \
+          --set inputs.training_data='azureml:diabetes-prod-folder:latest' \
+          --resource-group mlops-rg \
+          --workspace-name mlops-ws \
+          --stream
