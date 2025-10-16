@@ -1,17 +1,17 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
-# The directory to upload (relative to where the 'az ml job create' command is run, 
-# which is the GitHub Actions repository root: /home/runner/work/MLOps-by-Microsoft/MLOps-by-Microsoft/)
-code: ./src 
+# FIX: Use the current directory relative to the job.yml file's location (which is src/)
+# This resolves the Validation error: "Can't find directory...src/src"
+code: . 
 command: >-
-  # The command runner's working directory is often /mnt/code, 
-  # which contains the content of the 'code' path (i.e., train.py is directly inside /mnt/code)
+  # FIX: Keep the command simple. Since 'code: .' uploads the contents of src/
+  # the train.py file should be in the root of the uploaded code package.
   python train.py 
   --training_data ${{inputs.training_data}}
   --reg_rate ${{inputs.reg_rate}}
 inputs:
   training_data:
     type: uri_folder
-    # FIX: Ensures the URI is converted to a local path for train.py's os.path.exists() check
+    # CRITICAL FIX: Ensures data is downloaded locally for train.py
     mode: download
     path: azureml:diabetes-dev-folder:latest
   reg_rate: 0.01
