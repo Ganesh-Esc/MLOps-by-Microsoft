@@ -1,6 +1,6 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 # Path to the local folder containing your train.py script
-code: ./model
+code: ./src  # <-- CHANGED from ./model to ./src
 command: >-
   python train.py
   --training_data ${{inputs.training_data}}
@@ -8,9 +8,7 @@ command: >-
 inputs:
   training_data:
     type: uri_folder
-    # CRITICAL FIX: Add 'mode: download' to ensure the data is downloaded to a local path
     mode: download
-    # Using :latest is best practice in CI/CD unless you need a fixed version
     path: azureml:diabetes-dev-folder:latest
   reg_rate: 0.01
 environment: azureml:AzureML-sklearn-0.24-ubuntu18.04-py37-cpu@latest
