@@ -1,0 +1,43 @@
+name: Challenge 5 Environment Training Jobs
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  experiment:
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          tenant-id: 5f520565-3db9-495b-be28-c005e0523ac3 
+
+      - name: Trigger Dev Training Job
+        run: |
+          az ml job create --file azure-ml/job.yml --set inputs.training_data='azureml:diabetes-dev-folder:latest' --stream
+
+  production:
+    needs: experiment
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          tenant-id: 5f520565-3db9-495b-be28-c005e0523ac3
+
+      - name: Trigger Prod Training Job
+        run: |
+          az ml job create --file azure-ml/job.yml --set inputs.training_data='azureml:diabetes-prod-folder:latest' --stream
