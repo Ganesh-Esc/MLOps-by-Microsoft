@@ -27,12 +27,12 @@ jobs:
       - name: Azure Login
         uses: azure/login@v1
         with:
-          # Uses the full Service Principal JSON secret, resolving the login conflict
+          # Uses the full Service Principal JSON secret
           creds: ${{ secrets.AZURE_CREDENTIALS }}
           
       - name: Trigger Dev Training Job
         run: |
-          az ml job create --file azure-ml/job.yml \
+          az ml job create --file src/job.yml \
           --set inputs.training_data='azureml:diabetes-dev-folder:latest' \
           --resource-group mlops-rg \
           --workspace-name mlops-ws \
@@ -62,7 +62,7 @@ jobs:
 
       - name: Trigger Prod Training Job
         run: |
-          az ml job create --file azure-ml/job.yml \
+          az ml job create --file src/job.yml \
           --set inputs.training_data='azureml:diabetes-prod-folder:latest' \
           --resource-group mlops-rg \
           --workspace-name mlops-ws \
