@@ -12,14 +12,22 @@ jobs:
     environment: development
     steps:
       - uses: actions/checkout@v3
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        # Crucial step: Upgrade dependency tools first to avoid build errors
+        run: |
+          pip install --upgrade pip setuptools
+          pip install -r requirements.txt
+          
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
           tenant-id: 5f520565-3db9-495b-be28-c005e0523ac3 
-
+                 
       - name: Trigger Dev Training Job
         run: |
           az ml job create --file azure-ml/job.yml --set inputs.training_data='azureml:diabetes-dev-folder:latest' --stream
@@ -30,8 +38,15 @@ jobs:
     environment: production
     steps:
       - uses: actions/checkout@v3
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install --upgrade pip setuptools
+          pip install -r requirements.txt
+          
       - name: Azure Login
         uses: azure/login@v1
         with:
