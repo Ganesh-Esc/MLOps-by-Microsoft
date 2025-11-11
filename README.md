@@ -1,1 +1,1 @@
-#End-to-end machine learning operations (MLOps) with Azure Machine Learning
+End-to-end machine learning operations (MLOps) with Azure Machine Learning
